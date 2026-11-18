@@ -4,12 +4,18 @@
 // Dit is voor later, negeer voor nu
 mod hog;
 
+// WAT DIT ALGORITME DOET
+// We gaan op zoek naar de float met het laagste kwadraat!!!
+// Het globale minimum is dus 0, maar dat weet ons programma
+// niet, en we zullen dat best vaak ook niet als antwoord krijgen
+
 // Dit is het "ding" waar we mee werken
 // Wat het is maakt niet uit, in dit
-// geval is het gewoon een float (f32 in Rust)
+// geval is het gewoon een float. Float
+// heet in rust f32, omdat het 32 bits opneemt.
 //
 // Dit is een type alias, letterlijk gewoon
-// een Find+Replace van 'Solution' met 'f32'
+// een Find+Replace van 'Solution' naar 'f32'
 type Solution = f32;
 
 // Dit is de functie die we willen minimaliseren
@@ -54,9 +60,9 @@ fn cost(sol: &Solution) -> f32 {
     // Uncomment me and you get an error!
     // *sol += 1.0;
 
-    // Voor deze demo nemen we de waarde in het kwadraat
-    // het globale minima is dus 0, maar of we dat
-    // gaan vinden is de vraag
+    // Voor deze demo nemen we de waarde in het kwadraat.
+    // Hiervoor gebruiken we de ingebouwde 'powi' functie,
+    // die een float naar een integer-macht doet
     f32::powi(*sol, 2)
     //        ^
     //        |
@@ -83,11 +89,11 @@ fn cost(sol: &Solution) -> f32 {
 // in een 'impl' blok schrijven we alle functies
 // die bij een struct horen
 struct Solver {
-    current: Solution,
-    best: Solution,
-    iters: usize,
-    // Dit heeft de syntax:
-    // naam: type
+    current: Solution, // Dit is onze huidige oplossing, vanuit waar we zoeken
+    best: Solution,    // Dit is onze beste oplossing tot nu toe
+    iters: u32,        // Dit is hoeveel iteraties we hebben gedaan
+                       // 'u32' betekent 'unsigned 32-bit int', dus
+                       // het kan alleen 0 of groter bevatten
 }
 
 // Lets go write some functions!
@@ -109,6 +115,7 @@ impl Solver {
         // Dit is de Rust versie van 'new', je
         // vult de waarde van alle velden in.
         Solver {
+            // We beginnen bij 1, als simpel voorbeeld
             current: 1.0,
             best: 1.0,
             iters: 0,
@@ -196,36 +203,17 @@ impl Solver {
     fn iter(&mut self) {
         self.iters += 1;
 
-        // Dit is hoe een for loop er uit ziet!
-        // SO CLEAN!!
-        for n in NEIGHBORHOODS {
-            //   ^
-            //   |
-            // Dit is een array die hier beneden gedeclareerd is,
-            // maar ik heb geen zin om die code uit te gaan leggen.
-            //
-            // In short, een Neighborhood is een object met deze
-            // functie, die een nieuwe Solution geeft
-            //                  ||
-            //                  \/
-            let next = n.get_neighbor(&self.current);
-            if cost(&next) < cost(&self.current) {
-                self.current = next;
+        // Met 'let' declareer je een variabele.
+        // Het type is meestal optioneel, want
+        // Rust kan het vaak zelf uitvogelen,
+        // maar dat zou je er zo bij zetten:
+        //      let next: Solution = ...
+        let next = add_random(self.current);
 
-                // Hier gebruiken we return om
-                // met de functie te stoppen
-                return;
-            }
+        if cost(&next) < cost(&self.current) {
+            self.current = next;
         }
     }
-}
-
-// Dit is een Trait, de Rust versie van een Interface in C#
-// Alle types die we als "Neighborhood" markeren moeten
-// een functie hebben die &self en &Solution neemt, en
-// een nieuwe Solution maakt.
-trait Neighborhood {
-    fn get_neighbor(&self, sol: &Solution) -> Solution;
 }
 
 // Dit is de enige Neighborhood die we voor nu hebben:
@@ -238,6 +226,7 @@ fn add_random(sol: Solution) -> Solution {
 // Dit is de main functie, net zoals Main in
 // C# is dit waar on programma begint
 fn main() {
+    // Print some art :)
     println!("{}", hog::HOG_ART);
     println!("Welcome to trufflehog!");
 
@@ -252,17 +241,3 @@ fn main() {
     // de string
     println!("Found solution: {}", solution);
 }
-
-// === DANGER ZONE ===
-// Deze code is raar, don't worry about it :)
-// Ik zou hier stoppen als Rust nieuw voor je is
-impl<F> Neighborhood for F
-where
-    F: Fn(Solution) -> Solution,
-{
-    fn get_neighbor(&self, sol: &Solution) -> Solution {
-        self(*sol)
-    }
-}
-
-const NEIGHBORHOODS: [&dyn Neighborhood; 1] = [&add_random];
