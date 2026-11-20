@@ -206,14 +206,14 @@ impl Solver {
     // instance waarop we gaan werken (die als het
     // 'self' argument wordt meegegeven), en omdat
     // we dingen in die Solver gaan aanpassen moeten
-    // we het 'mut' markeren
+    // we het 'mut' markeren.
     //
     // "Waarom &mut self en niet mut self?"
     // Dit leg ik op een later moment is. De korte
-    // is dat de Solver instance na het aanroepen
-    // van 'solve()' weggegooid zal worden, omdat
-    // we geen reference nemen maar gewoon het hele
-    // object. Dit is voor nu niet relevant.
+    // versie is dat de Solver instance na het
+    // aanroepen van 'solve()' weggegooid zal worden,
+    // omdat we geen reference nemen maar gewoon het
+    // hele object. Dit is voor nu niet relevant.
     fn iter(&mut self) {
         self.iters += 1;
 
