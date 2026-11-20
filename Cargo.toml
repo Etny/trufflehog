@@ -3,5 +3,10 @@ name = "trufflehog"
 version = "0.1.0"
 edition = "2024"
 
+[profile.performance]
+inherits = "release"
+codegen-units = 1
+lto = "fat"
+
 [dependencies]
 fastrand = "2.5.0"

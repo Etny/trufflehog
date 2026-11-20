@@ -1,4 +1,4 @@
-pub trait Solution: Clone {
+pub trait Solution: Clone + std::fmt::Debug {
     type Context;
     type Mutation: Neighbor<Self>;
 

@@ -12,7 +12,7 @@ impl solution::Solution for f32 {
     type Mutation = f32;
 
     fn error(&self, _: &Self::Context) -> f32 {
-        f32::powi(*self, 2)
+        f32::powi(*self, 4) - (4.0 * f32::powi(*self, 2)) + (0.5 * *self)
     }
 
     fn apply(self, delta: Self::Mutation) -> Self {
@@ -20,7 +20,7 @@ impl solution::Solution for f32 {
     }
 
     fn random() -> Self {
-        (fastrand::f32() - 0.5) * 10_000.0
+        (fastrand::f32() - 0.5) * 20.0
     }
 }
 
@@ -31,7 +31,7 @@ impl Neighbor<f32> for f32 {
 }
 
 fn add_random(sol: &f32) -> f32 {
-    *sol + ((fastrand::f32() - 0.5) * 10.0)
+    *sol + ((fastrand::f32() - 0.5) * 0.1)
 }
 
 fn main() {
