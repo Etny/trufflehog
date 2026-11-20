@@ -130,7 +130,8 @@ impl Solver {
         // JE MAG NIKS AANPASSEN TENZIJ HET MET 'mut' GEMARKEERT IS
         // ========================================================
         //
-        // iedere variabele en argument kunnen we 'mut' voor zetten.
+        // 'Mut' staat voor 'mutable' aka 'aanpasbaar'.
+        // Ieder variabele en argument kunnen we 'mut' voor zetten.
         // Als we dat niet doen, kunnen we het niet aanpassen. EZ.
         //
         // "Waarom zou je niet alles als mut markeren?"
@@ -152,7 +153,7 @@ impl Solver {
         // Rust verstopt dit niet. Als het eerste argument van
         // een functie in een 'impl' block self heet, dan is
         // dat wat voor de punt staat bij de aanroep, maar
-        // je mag functies ook aanroepen alsof je static zijn.
+        // je mag functies ook aanroepen alsof ze static zijn.
 
         // Ook hier weer 'mut', want we gaan dit aanpassen.
         // We mouden hier bij hoeveel cycles we geen verbetering
@@ -160,7 +161,7 @@ impl Solver {
         //
         //  ||
         //  \/
-        let mut spun_cycles = 0;
+        let mut looped_cycles = 0;
 
         // 'loop' is letterlijk een oneindige loop (tot je break-t)
         loop {
@@ -168,19 +169,24 @@ impl Solver {
             self.iter();
 
             // Dit had dus niet gekunt zonder 'mut'
-            spun_cycles += 1;
+            looped_cycles += 1;
 
             // De '&'-tjes hier betekenen dat we het address
             // van de data meegeven, niet de data zelf.
             //      ||                    ||
             //      \/                    \/
             if cost(&self.current) < cost(&self.best) {
-                spun_cycles = 0;
+                // We hebben een betere oplossing gevonden,
+                // dus we gaan nog ff door
+                looped_cycles = 0;
 
                 // Dit had niet gekunt zonder 'self'
                 // als 'mut' te zetten
                 self.best = self.current;
-            } else if spun_cycles > 100000000 {
+
+                // Als we voor een hoop iteraties
+                // geen verbetering vinden stoppen we
+            } else if looped_cycles > 100000000 {
                 println!("Bailing!");
                 break;
             }
@@ -194,12 +200,20 @@ impl Solver {
         self.best
     }
 
-    // WTF BRO NU IS DIT OOK EEN REFERENCE!!!
+    // "Wat is een &mut self?"
     //
-    // Ja, dat klopt. Ik leg dit nog een keer uit.
-    // Het is niet ingewikkeld, maar voor nu niet
-    // belangrijk. In principe zullen bijna alle
-    // functies ooit references naar self nemen.
+    // Hier komt alles samen: we 'lenen' de Solver
+    // instance waarop we gaan werken (die als het
+    // 'self' argument wordt meegegeven), en omdat
+    // we dingen in die Solver gaan aanpassen moeten
+    // we het 'mut' markeren
+    //
+    // "Waarom &mut self en niet mut self?"
+    // Dit leg ik op een later moment is. De korte
+    // is dat de Solver instance na het aanroepen
+    // van 'solve()' weggegooid zal worden, omdat
+    // we geen reference nemen maar gewoon het hele
+    // object. Dit is voor nu niet relevant.
     fn iter(&mut self) {
         self.iters += 1;
 
@@ -218,9 +232,9 @@ impl Solver {
 
 // Dit is de enige Neighborhood die we voor nu hebben:
 // het telt letterlijk gewoon een random nummer tussen
-// -0.05 en 0.05 bij de solution op.
+// -0.2 en 0.2 bij de solution op.
 fn add_random(sol: Solution) -> Solution {
-    sol + (0.1 * fastrand::f32()) - 0.05
+    sol + (0.4 * fastrand::f32()) - 0.2
 }
 
 // Dit is de main functie, net zoals Main in
